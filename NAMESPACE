@@ -1,0 +1,6 @@
+importFrom("stats", "complete.cases", "dt")
+importFrom("utils", "read.csv2")
+importFrom("dplyr", "%>%", "mutate")
+importFrom("lubridate", "floor_date", "isoweek")
+importFrom("tibble", "is.tibble")
+importFrom("readr", "read_delim")

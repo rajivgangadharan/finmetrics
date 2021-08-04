@@ -1,0 +1,33 @@
+Package: finmetrics
+Type: Package
+Title: Project Delivery Metrics
+Version: 0.1.0
+Author: Rajiv Gangadharan
+Maintainer: The package maintainer <rajiv.gangadharan@gmail.com>
+Description: Set of utility functions for for generating plots and metrics from jira data. 
+License: GPL-3
+Encoding: UTF-8
+Depends: 
+    R (>= 3.1.0)
+Imports:
+    knitr,
+    DT,
+    rpivotTable,
+    plotly,
+    dplyr,
+    openintro,
+    viridis,
+    foreach,
+    colortools,
+    methods,
+    tibble,
+    lubridate,
+    readr,
+    testthat (>= 3.0.0)
+LazyData: true
+RoxygenNote: 7.1.1
+Suggests:
+    ggplot2,
+    ggvis
+    
+
