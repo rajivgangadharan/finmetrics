@@ -1,25 +1,25 @@
-#' getFilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%   addColCycleTime() %>% computeWeeklyFloorDates() %>% compute.Week()
-#' getFilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%  addColCycleTime() %>% computeWeeklyFloorDates() %>% computePriorityBasedWeeklyClosureAggregates()
+#' get.FilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%   addColCycleTime() %>% computeWeeklyFloorDates() %>% compute.Week()
+#' get.FilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%  addColCycleTime() %>% computeWeeklyFloorDates() %>% computePriorityBasedWeeklyClosureAggregates()
 
 
 #' Generate a tibble from a file filtered on a date
 #' Accepts a data file appropriately formatted which contains the Created Date,
 #' closed date, updated date of jira issues and a cut off date and returns
 #' a tibble.
-#' @name getFilteredTibble
+#' @name get.FilteredTibble
 #' @author "Rajiv Gangadharan"
 #' @return tib A tibble filtered on the cut off date. Closed Date is >= date_from
 #' @importFrom dplyr mutate
 #' @importFrom dplyr %>%
 #' @importFrom tibble as_tibble
 #' @examples
-#' getFilteredTibble(fileName="data/example_delivery.csv")
-#' getFilteredTibble(fileName="data/example_delivery.csv", sep="\t")
-#' getFilteredTibble(fileName="data/example_delivery.csv", sep=",", date_from=as.Date("2021-03-03"))
+#' get.FilteredTibble(fileName="data/example_delivery.csv")
+#' get.FilteredTibble(fileName="data/example_delivery.csv", sep="\t")
+#' get.FilteredTibble(fileName="data/example_delivery.csv", sep=",", date_from=as.Date("2021-03-03"))
 #' @usage
-#' getFilteredTibble(fileName="data/example_delivery.csv") %>% compute.CycleTime()
+#' get.FilteredTibble(fileName="data/example_delivery.csv") %>% compute.CycleTime()
 #' @export
-getFilteredTibble <- function(fileName,
+get.FilteredTibble <- function(fileName,
                               sep = '\t',
                               date_from = Sys.Date() - months(6),
                               col_created_on = "Created",
@@ -47,7 +47,7 @@ getFilteredTibble <- function(fileName,
 #' @description Filters out all cases other than closed cases
 #' @aliases excludeOpenCases
 #' @examples
-#' getFilteredTibble(fileName="example_delivery.csv") %>% get.ClosedCases()
+#' get.FilteredTibble(fileName="example_delivery.csv") %>% get.ClosedCases()
 #' @seealso  compute.CycleTime
 #' @export
 get.ClosedCases <- function(tib_df, col_closed_date = "cldt") {
@@ -84,7 +84,7 @@ exclude.OpenCases <- get.ClosedCases
 #' compute.CycleTime(tdf, col_created_on = "Created", col_closed_date = "Closed")
 #' compute.CycleTime(tdf)
 #' @usage
-#' getFilteredTibble(fileName="data/example_delivery.csv") %>% compute.CycleTime(tdf)
+#' get.FilteredTibble(fileName="data/example_delivery.csv") %>% compute.CycleTime(tdf)
 compute.CycleTime <- function(tib_df,
                              col_created_on = "crdt",
                              col_closed_date = "cldt") {
@@ -131,7 +131,7 @@ compute.Week <- function(tib_df, col_closed_date = "cldt") {
 #' @param col_priority Column name of the priority of the closed items
 #' @seealso compute.Week()
 #' @usage
-#' getFilteredTibble(fileName="data/example_delivery.csv") %>%  get.ClosedCases() %>% compute.CycleTime() %>% compute.Week() %>% compute.PriorityBased.ClosureAggregates()
+#' get.FilteredTibble(fileName="data/example_delivery.csv") %>%  get.ClosedCases() %>% compute.CycleTime() %>% compute.Week() %>% compute.PriorityBased.ClosureAggregates()
 compute.PriorityBased.ClosureAggregates <-
   function(tib_df, col_date = "FloorDate", col_priority ="Priority") {
   tib_df <- tib_df  %>%
@@ -188,7 +188,7 @@ compute.ClosureAggregates <-
 #' @param col_numclosed The column name of the tibble which has the
 #' number of closed items
 #' @usage
-#' getFilteredTibble(fileName="data/example_delivery.csv") %>%  compute.CycleTime() %>% compute.Week() %>% compute.ClosureAggregates() %>% compute.NumWeeksForClosureCount()
+#' get.FilteredTibble(fileName="data/example_delivery.csv") %>%  compute.CycleTime() %>% compute.Week() %>% compute.ClosureAggregates() %>% compute.NumWeeksForClosureCount()
 
 compute.NumWeeksForClosureCount <- function(tib_df,
                                            col_numclosed = "NumClosed") {
@@ -230,7 +230,13 @@ get.WIPInDays <- function(created, closed, loop_date = Sys.Date()) {
 #' @param tib Tibble containing Open and Closed Dates.
 #' @param col_created_date Column name with created date (default: crdt)
 #' @param col_closed_date Column name with closed date (default: cldt)
+#'
 #' @return Tibble with Date (Created Date) and Sum of WIP In Days
+#'
+#' @importFrom lubridate is.Date
+#'
+#'
+#' @export
 compute.WIP <- function(tib, col_created_date = "crdt",
                        col_closed_date = "cldt") {
   # Create a date vector from the tibble
