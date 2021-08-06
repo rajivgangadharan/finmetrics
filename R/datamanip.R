@@ -85,6 +85,7 @@ exclude.OpenCases <- get.ClosedCases
 #' compute.CycleTime(tdf)
 #' @usage
 #' get.FilteredTibble(fileName="data/example_delivery.csv") %>% compute.CycleTime(tdf)
+#' @export compute.CycleTime
 compute.CycleTime <- function(tib_df,
                              col_created_on = "crdt",
                              col_closed_date = "cldt") {
@@ -137,7 +138,7 @@ compute.PriorityBased.ClosureAggregates <-
   tib_df <- tib_df  %>%
     dplyr::group_by(tib_df[[col_date]], tib_df[[col_priority]])  %>%
     dplyr::summarise(NumClosed = dplyr::n(), .groups = "drop")
-  colnames(tib_df) <- c("Date", "Priority", "NumClosed")
+  colnames(tib_df) <- c("FloorDate", "Priority", "NumClosed")
   tib_df
 }
 
@@ -242,17 +243,35 @@ compute.WIP <- function(tib, col_created_date = "crdt",
   # Create a date vector from the tibble
   stopifnot(lubridate::is.Date(tib[[col_created_date]]))
   dt_vec <- sort(unique(tib[[col_closed_date]]))
-  # Iterate over the date vector and on each day sum up the WIP in Days
-  wip_vec <-
-    foreach::foreach (dt = dt_vec) %dopar% {
-      sum(mapply(
-        FUN = get.WIPInDays,
-        created = tib[[col_created_date]],
-        closed = tib[[col_closed_date]],
-        loop_date = dt
-      ))
-    }
+  wip_vec <- lapply(dt_vec, FUN=sum.WIPInDays, tib=tib)
   wip_tibble <- tibble::tibble(dt_vec, wip_vec)
   names(wip_tibble) <- c("Date", "WIPInDays")
   wip_tibble
+}
+
+sum.WIPInDays <-
+  function(dt,
+           tib,
+           col_created_date = "crdt",
+           col_closed_date = "cldt"
+           ) {
+    stopifnot (lubridate::is.Date(tib[[col_created_date]]) &&
+                 lubridate::is.Date(tib[[col_closed_date]]))
+    stopifnot(tibble::is_tibble(tib))
+    sum(mapply(
+      FUN = get.WIPInDays,
+      created = tib[[col_created_date]],
+      closed = tib[[col_closed_date]],
+      loop_date = dt
+    ))
+  }
+
+#' @name constuct.WIPTibble
+#' @description Constructs a tibble based on various parameters
+#' @return A tibble
+#' @title Constructs a tibble based on a data file, date from and type to be used for computing the WIP
+#' @importFrom dplyr filter %>%
+#' @export construct.WIPTibble
+construct.WIPTibble <-  function(tib) {
+      tib %>% finmetrics::compute.WIP()
 }

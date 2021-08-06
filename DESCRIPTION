@@ -17,17 +17,19 @@ Imports:
     dplyr,
     openintro,
     viridis,
-    foreach,
     colortools,
     methods,
     tibble,
     lubridate,
     readr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    foreach,
+    parallel,
+    doSNOW,
+    doParallel,
+    doMPI
 LazyData: true
 RoxygenNote: 7.1.1
 Suggests:
     ggplot2,
     ggvis
-    
-
