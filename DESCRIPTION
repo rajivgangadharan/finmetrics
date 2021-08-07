@@ -23,11 +23,6 @@ Imports:
     lubridate,
     readr,
     testthat (>= 3.0.0),
-    foreach,
-    parallel,
-    doSNOW,
-    doParallel,
-    doMPI
 LazyData: true
 RoxygenNote: 7.1.1
 Suggests:
