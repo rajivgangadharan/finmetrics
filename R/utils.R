@@ -1,3 +1,27 @@
+# utils.R
+# File contains utility functions for the finmetrics package.
+# Rajiv Gangadharan <rajiv.gangadharan@gmail.com>
+# Copyright 2017 Rajiv Gangadharan <rajiv.gangadharan@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#'
+#' Check if the parameter is None or not
+#' @name is.none
+#' @description Purpose is to handle None values inserted into the data files due to python scripts
+#' @param x variable for which None value has to be handled
+#' @return TRUE or FALSE based of if the Value is None
 is.none <- function(x) {
   ifelse(x == "None", TRUE, FALSE)
 }
@@ -7,28 +31,26 @@ convertNoneToNA <- function(x) {
 }
 
 #' Convert string into date
-#'
+#' @name toDate
+#' @title Takes a string and then converts into date
+#' @description
+#' Takes a string and then converts into date, utility function to be used in datamanip.R by many functions.
+#' @details
+#' kes a string and then converts into date, utility function to be used in datamanip.R by many functions.
 #' @param argString A string to convert into date
-#' @param y A date format with default "%Y-%m-%d %H:%M:%S"
+#' @param dateFormat A valid date format
 #' @return The string converted into a date
-#' @examples
-#' toDate("2021-03-07", "%Y-%m-%d")
-
 toDate <- function(argString, dateFormat = "%Y-%m-%d") {
-  # ifelse(is.na(argString),
-  #        NA,
-         as.Date(argString,
-                 format = dateFormat)
-  #)
-
+  as.Date(argString,
+          format = dateFormat)
 }
 
 maxDate <- function(dateVec) {
-  return (max(dateVec, na.rm=TRUE))
+  return (max(dateVec, na.rm = TRUE))
 }
 
 minDate <- function(dateVec) {
-  return (min(dateVec, na.rm=TRUE))
+  return (min(dateVec, na.rm = TRUE))
 }
 
 # isWIP <- function(x, loop_date=loopdt) {
@@ -66,28 +88,44 @@ minDate <- function(dateVec) {
 #' tib$WIPDAYS_2021_02_21 <- apply(tib, 1, getWIPInDays, ymd("2021-02-21"))
 #' Tested using tib$WIP_2021_02_21 <- apply(tib, 1, isWIP, ymd("2021-02-21"))
 
-getAgeInDays <- function(beginDate, endDate=Sys.Date()) {
-  stopifnot(exprs = {lubridate::is.Date(beginDate);
-    lubridate::is.Date(endDate)})
+#' @name getAgeInDays
+#' @param beginDate the begining date
+#' @param endDate defaults to system date
+#' @title gets the age in days from the begining and closing date
+#' @description Gets the age of the work item in days
+#' @seealso  compute.CycleTime
+#' @export
+getAgeInDays <- function(beginDate, endDate = Sys.Date()) {
+  stopifnot(exprs = {
+    lubridate::is.Date(beginDate)
+
+    lubridate::is.Date(endDate)
+  })
   ## ifelse to handle anomalous condition of Closed Date < Created Date
   ifelse(beginDate > endDate, 0,
-         as.numeric(difftime(endDate, beginDate, units="days")))
+         as.numeric(difftime(endDate, beginDate, units = "days")))
 }
 
+#' @name get.Age.In.Days
+#' @param beginDate the begining date
+#' @param endDate defaults to system date
+#' @title gets the age in days from the begining and closing date
+#' @description Gets the age of the work item in days
+#' @seealso  compute.CycleTime
+#' @export
+get.Age.In.Days <- getAgeInDays
 
 readDataset <- function(fileName, sep = '|') {
   stopifnot(file.exists(fileName)) # Will stop of the file doesn't exist
   # Loading the tab separated file
   readr::read_delim(fileName, sep,
-             escape_double = FALSE,
-             trim_ws = TRUE)
+                    escape_double = FALSE,
+                    trim_ws = TRUE)
 }
 
 
-readCSVDataset <- function(fileName, sep='|') {
+readCSVDataset <- function(fileName, sep = '|') {
   stopifnot(file.exists(fileName))
-  df <- read.csv2(fileName, header=TRUE, sep=sep)
+  df <- read.csv2(fileName, header = TRUE, sep = sep)
   df
 }
-
-
