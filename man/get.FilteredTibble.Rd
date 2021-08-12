@@ -16,7 +16,7 @@ get.FilteredTibble(fileName="data/example_delivery.csv", sep=",", date_from=as.D
 get.FilteredTibble(
   fileName,
   sep = "\\t",
-  date_from = Sys.Date() - months(6),
+  date_from = Sys.Date() - months(12),
   col_created_on = "Created",
   col_updated_date = "Updated",
   col_closed_date = "Closed"
