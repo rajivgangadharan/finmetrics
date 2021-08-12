@@ -25,7 +25,7 @@
 #' @export
 get.FilteredTibble <- function(fileName,
                               sep = '\t',
-                              date_from = Sys.Date() - months(6),
+                              date_from = Sys.Date() - months(12),
                               col_created_on = "Created",
                               col_updated_date = "Updated",
                               col_closed_date = "Closed") {
