@@ -257,7 +257,8 @@ compute.WIP <- function(tib, col_created_date = "crdt",
                        col_closed_date = "cldt") {
   # Create a date vector from the tibble
   stopifnot(lubridate::is.Date(tib[[col_created_date]]))
-  dt_vec <- sort(unique(tib[[col_closed_date]]))
+  #dt_vec <- sort(unique(tib[[col_closed_date]]))
+  dt_vec <- sort(unique(tib[[col_created_date]]))
   wip_vec <- lapply(dt_vec, FUN=sum.WIPInDays, tib=tib)
   wip_tibble <- tibble::tibble(dt_vec, wip_vec)
   names(wip_tibble) <- c("Date", "WIPInDays")
