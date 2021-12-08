@@ -42,7 +42,11 @@ get.FilteredTibble <- function(fileName,
       cldt = toDate(tib[[col_closed_date]],
                     dateFormat = "%Y-%m-%d")
     )
-  tib %>% dplyr::filter(tib[[col_created_on]] >= date_from)
+  tib %>%
+    dplyr::filter(tib[[col_created_on]] >= date_from)
+    dplyr::filter(tib[[col_closed_date]] >= date_from)
+      # Added to filterout anomalies when Created > Closed Dates
+
 }
 
 #'
