@@ -46,7 +46,6 @@ get.FilteredTibble <- function(fileName,
     dplyr::filter(tib[[col_created_on]] >= date_from) %>%
     dplyr::filter(cldt >= date_from)
       # Added to filter out anomalies when Created > Closed Dates
-
 }
 
 #'
