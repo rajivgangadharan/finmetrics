@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+man/*
+man/**
+*.Rd
+man/compute.ClosureAggregates.Rd
+finmetrics.Rproj
+*.rda
