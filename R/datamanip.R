@@ -120,7 +120,7 @@ compute.Week <- function(tib_df, col_closed_date = "cldt") {
       dplyr::mutate(FloorDate =
                lubridate::floor_date(tib_df[[col_closed_date]],
                                      unit = "weeks",
-                                     week_start = 1))
+                                     week_start = 7))
   tib_df <- computeWeeklyFloorDates()
   tib_df %>% mutate(Week = lubridate::isoweek(tib_df$FloorDate))
 }
