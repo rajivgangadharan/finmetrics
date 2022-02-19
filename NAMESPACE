@@ -18,4 +18,3 @@ export(compute.ClosureAggregates)
 export(compute.NumWeeksForClosureCount)
 export(get.WIPInDays)
 export(compute.WIP)
-

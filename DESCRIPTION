@@ -24,7 +24,7 @@ Imports:
     readr,
     testthat (>= 3.0.0),
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests:
     ggplot2,
     ggvis

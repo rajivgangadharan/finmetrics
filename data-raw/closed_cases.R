@@ -1,1 +1,0 @@
-getFilteredTibble(fileName="inst/extdata/example_delivery.csv") %>% get.ClosedCases()
