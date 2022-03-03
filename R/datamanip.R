@@ -140,9 +140,11 @@ compute.Week <- function(tib_df, col_closed_date = "cldt") {
 #' @seealso compute.Week()
 #' @export
 compute.PriorityBased.ClosureAggregates <-
-  function(tib_df, col_date = "FloorDate", col_priority ="Priority") {
+  function(tib_df) {
+    if (! hasName(tib_df, "FloorDate") && ! hasName(tib_df, "Priority"))
+      stop("Expected names not found.")
   tib_df <- tib_df  %>%
-    dplyr::group_by(tib_df[[col_date]], tib_df[[col_priority]])  %>%
+    dplyr::group_by(FloorDate, Priority)  %>%
     dplyr::summarise(NumClosed = dplyr::n(), .groups = "drop")
   colnames(tib_df) <- c("FloorDate", "Priority", "NumClosed")
   tib_df
@@ -158,8 +160,10 @@ compute.PriorityBased.ClosureAggregates <-
 compute.Weekly.ClosureAggregates <-
   function(tib_df, col_week = "Week") {
     stopifnot(tibble::is_tibble(tib_df))
+    if (! hasName(tib_df, "Week"))
+      stop("Expected name Week not found.")
     tib_df <- tib_df  %>%
-      dplyr::group_by(tib_df[[col_week]])  %>%
+      dplyr::group_by(Week)  %>%
       dplyr::summarise(NumClosed = dplyr::n())
     colnames(tib_df) <- c("Week", "NumClosed")
     tib_df
