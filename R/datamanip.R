@@ -19,31 +19,25 @@
 #' @param fileName Input file name
 #' @param sep seperator
 #' @param date_from cut off date for the data frame
-#' @param col_created_on Column name of the created column
-#' @param col_updated_date Column name of the updated column
-#' @param col_closed_date Column name of the closed date column
 #' @export
 get.FilteredTibble <- function(fileName,
                               sep = '\t',
-                              date_from = Sys.Date() - months(18),
-                              col_created_on = "Created",
-                              col_updated_date = "Updated",
-                              col_closed_date = "Closed") {
+                              date_from = Sys.Date() - months(18)) {
   tib <- readDataset(fileName, sep) %>% tibble::as_tibble()
-  tib[, col_closed_date] <- apply(tib[, col_closed_date],
+  tib[, "Closed"] <- apply(tib[, "Closed"],
                                   1,
                                   convertNoneToNA)
   tib <- tib %>%
     mutate(
-      crdt = toDate(tib[[col_created_on]],
+      crdt = toDate(tib$Created,
                     dateFormat = "%Y-%m-%d"),
-      updt = toDate(tib[[col_updated_date]],
+      updt = toDate(tib$Updated,
                     dateFormat = "%Y-%m-%d"),
-      cldt = toDate(tib[[col_closed_date]],
+      cldt = toDate(tib$Closed,
                     dateFormat = "%Y-%m-%d")
     )
   tib %>%
-    dplyr::filter(tib[[col_created_on]] >= date_from) %>%
+    dplyr::filter(Created >= date_from) %>%
     dplyr::filter(is.na(cldt) | cldt >= date_from)
       # Added to filter out anomalies when Created > Closed Dates
 }
@@ -52,20 +46,18 @@ get.FilteredTibble <- function(fileName,
 #' get.FilteredTibble(fileName="example_delivery.csv") %>% get.ClosedCases()
 #' @name get.ClosedCases
 #' @param tib_df Input data frame which has unclosed cases as well
-#' @param col_closed_date Column which has the closed date
 #' @title Takes a tibble and returns a list of closed cases
 #' @description Filters out all cases other than closed cases
 #' @seealso  compute.CycleTime
 #' @export
-get.ClosedCases <- function(tib_df, col_closed_date = "cldt") {
-  dss <- tib_df[,c(col_closed_date)]
+get.ClosedCases <- function(tib_df) {
+  dss <- tib_df[,c("cldt")]
   tib_df[complete.cases(dss),]
 }
 
 #' @name exclude.OpenCases
 #' @title Alias for get.ClosedCases()
 #' @param tib_df Input data frame which has unclosed cases as well
-#' @param col_closed_date Column which has the closed date
 #' @title Takes a tibble and returns a list of closed cases
 #' @description
 #' Filters out all cases other than closed cases
@@ -87,15 +79,11 @@ exclude.OpenCases <- get.ClosedCases
 #' @importFrom dplyr %>%
 #' @importFrom tibble as_tibble
 #' @param tib_df Tibble containing the created date and closed date
-#' @param col_created_on String which has the name of the created_on column defaults to "crdt"
-#' @param col_closed_date String which has the name of the closed_date column defaults to "cldt"
 #' @export compute.CycleTime
-compute.CycleTime <- function(tib_df,
-                             col_created_on = "crdt",
-                             col_closed_date = "cldt") {
+compute.CycleTime <- function(tib_df) {
   tib_df %>% mutate(cylt =
-                      as.numeric(getAgeInDays(tib_df[[col_created_on]],
-                                              tib_df[[col_closed_date]])))
+                      as.numeric(getAgeInDays(tib_df$crdt,
+                                              tib_df$cldt)))
 }
 
 #' @name compute.Week
@@ -109,16 +97,16 @@ compute.CycleTime <- function(tib_df,
 #' Adds a column called Week using the the Floor Date
 #' derived from Closed date
 #' @param tib_df Input tibble with the Closed Date
-#' @param col_closed_date The Column name which has the closed date
 #' @export
-compute.Week <- function(tib_df, col_closed_date = "cldt") {
-  stopifnot(exprs = {tibble::is_tibble(tib_df);
-    is.character(col_closed_date)})
+compute.Week <- function(tib_df) {
+  stopifnot(exprs = {tibble::is_tibble(tib_df);})
+  if (! hasName(tib_df, "cldt"))
+    stop("Expected name cldt not found.")
 
   computeWeeklyFloorDates <-  function()
       tib_df %>%
       dplyr::mutate(FloorDate =
-               lubridate::floor_date(tib_df[[col_closed_date]],
+               lubridate::floor_date(cldt,
                                      unit = "weeks",
                                      week_start = 7))
   tib_df <- computeWeeklyFloorDates()
@@ -134,15 +122,12 @@ compute.Week <- function(tib_df, col_closed_date = "cldt") {
 #' generates a tibble with the Date, Priority and Number of Work Items
 #' Closed
 #' @param tib_df Tibble containing complete cases
-#' @param col_date Column Name of with the Floor Date derived from
-#' the Closed Date
-#' @param col_priority Column name of the priority of the closed items
 #' @seealso compute.Week()
 #' @export
 compute.PriorityBased.ClosureAggregates <-
   function(tib_df) {
     if (! hasName(tib_df, "FloorDate") && ! hasName(tib_df, "Priority"))
-      stop("Expected names not found.")
+      stop("Expected names FloorDate and Priority not found in tibble.")
   tib_df <- tib_df  %>%
     dplyr::group_by(FloorDate, Priority)  %>%
     dplyr::summarise(NumClosed = dplyr::n(), .groups = "drop")
@@ -156,9 +141,9 @@ compute.PriorityBased.ClosureAggregates <-
 #' @title Computes closure aggregates for every week
 #' @return tib_df the aggregated tibble
 #' @param tib_df Unaggregated tibble  with the week number as a variable
-#' @param col_week A column which has the week number as the variable
+#' @export
 compute.Weekly.ClosureAggregates <-
-  function(tib_df, col_week = "Week") {
+  function(tib_df) {
     stopifnot(tibble::is_tibble(tib_df))
     if (! hasName(tib_df, "Week"))
       stop("Expected name Week not found.")
@@ -177,13 +162,14 @@ compute.Weekly.ClosureAggregates <-
 #' @title Computes closure aggregates for every FloorDate
 #' @return tib_df the aggregated tibble
 #' @param tib_df Unaggregated tibble  with the week number as a variable
-#' @param col_dt A column which has the FloorDate as the variable
-
+#' @export
 compute.FloorDateBased.ClosureAggregates <-
-  function(tib_df, col_dt = "FloorDate") {
+  function(tib_df) {
     stopifnot(tibble::is_tibble(tib_df))
+    if (! hasName(tib_df, "FloorDate"))
+      stop("Expected name FloorDate not found.")
     tib_df <- tib_df  %>%
-      dplyr::group_by(tib_df[[col_dt]])  %>%
+      dplyr::group_by(FloorDate)  %>%
       dplyr::summarise(NumClosed = dplyr::n())
     colnames(tib_df) <- c("FloorDate", "NumClosed")
     tib_df
@@ -195,13 +181,14 @@ compute.FloorDateBased.ClosureAggregates <-
 #' @description takes a tibble with a Week Column and a Floor date Column and then returns an aggregated tibble
 #' @returns tibble with Week, FloorDate and NumClosed Columns
 #' @param tib_df Tibble with Week and Floor Date Information
-#' @param col_dt Date to be aggregated on
-#' @param col_week Week to be aggregated on
+#' @export
 compute.ClosureAggregates <-
-  function(tib_df, col_dt = "FloorDate", col_week = "Week") {
+  function(tib_df) {
     stopifnot(tibble::is_tibble(tib_df))
+    if (! hasName(tib_df, "FloorDate") && ! hasName(tib_df, "Week"))
+      stop("Expected names FloorDate or Week not found in tibble")
     tib_df <- tib_df  %>%
-      dplyr::group_by(tib_df[[col_week]], tib_df[[col_dt]])  %>%
+      dplyr::group_by(FloorDate, Week)  %>%
       dplyr::summarise(NumClosed = dplyr::n(), .groups = "drop")
     colnames(tib_df) <- c("Week", "FloorDate","NumClosed")
     tib_df
@@ -214,15 +201,14 @@ compute.ClosureAggregates <-
 #' @title Computes the number of weeks with a particular closure count
 #' @description Can be used for finding out how predictable the delivery is
 #' @param tib_df The Tibble which has "Number of Weeks" for each "Closure Count
-#' @param col_numclosed The column name of the tibble which has the
-#' number of closed items
 #' @export
-compute.NumWeeksForClosureCount <- function(tib_df,
-                                           col_numclosed = "NumClosed") {
+compute.NumWeeksForClosureCount <- function(tib_df) {
   stopifnot(tibble::is_tibble(tib_df))
+  if (! hasName(tib_df, "NumClosed"))
+    stop("Expected name NumClosed not found in tib_df")
   tib_df <-
     tib_df %>%
-    dplyr::group_by(tib_df[[col_numclosed]]) %>%
+    dplyr::group_by(NumClosed) %>%
     dplyr::summarise(NumWeeks = dplyr::n())
   colnames(tib_df) <- c("NumClosed", "NumWeeks")
   tib_df
@@ -255,36 +241,32 @@ get.WIPInDays <- function(created, closed, loop_date = Sys.Date()) {
 #' @title Takes a tibble and returns a tibble with wip for each date
 #' @description Takes a tibble and returns a tibble with wip for each date
 #' @param tib Tibble containing Open and Closed Dates.
-#' @param col_created_date Column name with created date (default: crdt)
-#' @param col_closed_date Column name with closed date (default: cldt)
 #' @return Tibble with Date (Created Date) and Sum of WIP In Days
 #' @importFrom lubridate is.Date
 #' @export
-compute.WIP <- function(tib, col_created_date = "crdt",
-                       col_closed_date = "cldt") {
+compute.WIP <- function(tib) {
   # Create a date vector from the tibble
-  stopifnot(lubridate::is.Date(tib[[col_created_date]]))
-  #dt_vec <- sort(unique(tib[[col_closed_date]]))
-  dt_vec <- sort(unique(tib[[col_created_date]]))
+  stopifnot(lubridate::is.Date(tib$crdt))
+  if (! hasName(tib, "crdt"))
+    stop("Expected name crdt not found in tibble.")
+
+  dt_vec <- sort(unique(tib$crdt))
   wip_vec <- lapply(dt_vec, FUN=sum.WIPInDays, tib=tib)
   wip_tibble <- tibble::tibble(dt_vec, wip_vec)
   names(wip_tibble) <- c("Date", "WIPInDays")
   wip_tibble
 }
 
-sum.WIPInDays <-
-  function(dt,
-           tib,
-           col_created_date = "crdt",
-           col_closed_date = "cldt"
-           ) {
-    stopifnot (lubridate::is.Date(tib[[col_created_date]]) &&
-                 lubridate::is.Date(tib[[col_closed_date]]))
+sum.WIPInDays <- function(dt, tib) {
+    stopifnot (lubridate::is.Date(tib$crdt) &&
+                 lubridate::is.Date(tib$cldt))
     stopifnot(tibble::is_tibble(tib))
+    if (! hasName(tib, "crdt") && ! hasName(tib, "cldt"))
+      stop("Expected names crdt or/and cldt not found in tibble.")
     sum(mapply(
       FUN = get.WIPInDays,
-      created = tib[[col_created_date]],
-      closed = tib[[col_closed_date]],
+      created = tib$crdt,
+      closed = tib$cldt,
       loop_date = dt
     ))
   }
