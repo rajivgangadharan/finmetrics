@@ -97,16 +97,17 @@ compute.CycleTime <- function(tib_df) {
 #' Adds a column called Week using the the Floor Date
 #' derived from Closed date
 #' @param tib_df Input tibble with the Closed Date
+#' @param dt_col Name of the column which has the date column
 #' @export
-compute.Week <- function(tib_df) {
+compute.Week <- function(tib_df, dt_col = "cldt") {
   stopifnot(exprs = {tibble::is_tibble(tib_df);})
-  if (! hasName(tib_df, "cldt"))
+  if (! hasName(tib_df, dt_col))
     stop("Expected name cldt not found.")
 
   computeWeeklyFloorDates <-  function()
       tib_df %>%
       dplyr::mutate(FloorDate =
-               lubridate::floor_date(cldt,
+               lubridate::floor_date(dt_col,
                                      unit = "weeks",
                                      week_start = 7))
   tib_df <- computeWeeklyFloorDates()
