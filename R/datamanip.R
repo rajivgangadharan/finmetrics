@@ -104,12 +104,13 @@ compute.Week <- function(tib_df, dt_col = "cldt") {
   if (! hasName(tib_df, dt_col))
     stop("Expected name cldt not found.")
 
-  computeWeeklyFloorDates <-  function()
+  computeWeeklyFloorDates <-  function() {
       tib_df %>%
-      dplyr::mutate_(FloorDate =
-               lubridate::floor_date(dt_col,
+      dplyr::mutate(FloorDate =
+               lubridate::floor_date(.data[[dt_col]],
                                      unit = "weeks",
                                      week_start = 7))
+  }
   tib_df <- computeWeeklyFloorDates()
   tib_df %>% mutate(Week = lubridate::isoweek(tib_df$FloorDate))
 }
