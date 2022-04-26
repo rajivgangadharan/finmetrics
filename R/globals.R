@@ -1,0 +1,10 @@
+utils::globalVariables(c("FloorDate", 
+                         "Week", 
+                         "NumClosed",
+                         "Priority",
+                         "Created",
+                         "Closed",
+                         "Updated",
+                         "cldt",
+                         "crdt"
+                         ))
