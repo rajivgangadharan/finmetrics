@@ -22,8 +22,14 @@
 #' @export
 get.FilteredTibble <- function(fileName,
                               sep = '\t',
-                              date_from = Sys.Date() - months(18)) {
+                              date_from = Sys.Date() - months(18),
+                              filter_na = TRUE,
+                              filter_na_col = "cldt",
+                              filter_anom = TRUE) {
+  
   tib <- readDataset(fileName, sep) %>% tibble::as_tibble()
+  
+  # Converting Closed from None to NA. Python makes it None.
   tib[, "Closed"] <- apply(tib[, "Closed"],
                                   1,
                                   convertNoneToNA)
@@ -36,10 +42,28 @@ get.FilteredTibble <- function(fileName,
       cldt = toDate(tib$Closed,
                     dateFormat = "%Y-%m-%d")
     )
-  tib %>%
-    dplyr::filter(Created >= date_from) %>%
-    dplyr::filter(is.na(cldt) | cldt >= date_from)
-      # Added to filter out anomalies when Created > Closed Dates
+  
+  # Onviously the Created date should be more than date_from
+  tib <- tib %>% dplyr::filter(Created >= date_from) 
+  
+  # If you have to filter NAs then check if a column is provided
+  # If column is provided filter based on that else filter on "Closed"
+  
+  if ((filter_na == TRUE) ) { # Should default to TRUE, because need Closed only
+    ifelse (hasArg(filter_na_col),
+      tib <- tib %>% dplyr::filter(! is.na(.data[[filter_na_col]])),
+      tib <- tib %>% dplyr::filter(! is.na(tib$Closed)))
+    
+    # Added to filter out anomalies when Created > Closed Dates
+    # This will make sense only if cldt is not NA (i.e filter_na is TRUE)
+    if (filter_anom == TRUE) {
+      tib <- tib %>% filter(crdt <= cldt)
+    }
+      
+  }
+ 
+  tib
+     
 }
 
 #'
