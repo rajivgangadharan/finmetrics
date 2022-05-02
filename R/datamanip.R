@@ -19,6 +19,9 @@
 #' @param fileName Input file name
 #' @param sep seperator
 #' @param date_from cut off date for the data frame
+#' @param filter_na flag to indicate if NA needs to be filtered
+#' @param filter_na_col column name if the NA filtering should not happen with Closed
+#' @param filter_anom flag to filter out anomalous rows only works if filter_na is set
 #' @export
 get.FilteredTibble <- function(fileName,
                               sep = '\t',
