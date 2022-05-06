@@ -1,7 +1,7 @@
 Package: finmetrics
 Type: Package
 Title: Project Delivery Metrics
-Version: 0.1.2
+Version: 0.1.2-3
 Author: Rajiv Gangadharan
 Maintainer: The package maintainer <rajiv.gangadharan@gmail.com>
 Description: Set of utility functions for for generating plots and metrics from jira data. 

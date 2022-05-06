@@ -19,16 +19,10 @@
 #' @param fileName Input file name
 #' @param sep seperator
 #' @param date_from cut off date for the data frame
-#' @param filter_na flag to indicate if NA needs to be filtered
-#' @param filter_na_col column name if the NA filtering should not happen with Closed
-#' @param filter_anom flag to filter out anomalous rows only works if filter_na is set
 #' @export
 get.FilteredTibble <- function(fileName,
                               sep = '\t',
-                              date_from = Sys.Date() - months(18),
-                              filter_na = TRUE,
-                              filter_na_col = "cldt",
-                              filter_anom = TRUE) {
+                              date_from = Sys.Date() - months(18)) {
   
   tib <- readDataset(fileName, sep) %>% tibble::as_tibble()
   
@@ -49,22 +43,6 @@ get.FilteredTibble <- function(fileName,
   # Onviously the Created date should be more than date_from
   tib <- tib %>% dplyr::filter(Created >= date_from) 
   
-  # If you have to filter NAs then check if a column is provided
-  # If column is provided filter based on that else filter on "Closed"
-  
-  if ((filter_na == TRUE) ) { # Should default to TRUE, because need Closed only
-    ifelse (hasArg(filter_na_col),
-      tib <- tib %>% dplyr::filter(! is.na(.data[[filter_na_col]])),
-      tib <- tib %>% dplyr::filter(! is.na(tib$Closed)))
-    
-    # Added to filter out anomalies when Created > Closed Dates
-    # This will make sense only if cldt is not NA (i.e filter_na is TRUE)
-    if (filter_anom == TRUE) {
-      tib <- tib %>% filter(crdt <= cldt)
-    }
-      
-  }
- 
   tib
      
 }
