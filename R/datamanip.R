@@ -43,6 +43,7 @@ get.FilteredTibble <- function(fileName,
   # Onviously the Created date should be more than date_from
   tib <- tib %>% dplyr::filter(Created >= date_from) 
   
+ 
   tib
      
 }
