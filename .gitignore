@@ -1,10 +1,11 @@
 .Rproj.user
 .Rhistory
-.RData
+*.RData
 .Ruserdata
 man/*
 man/**
 *.Rd
 man/compute.ClosureAggregates.Rd
 finmetrics.Rproj
+mtrxrlib.Rproj
 *.rda

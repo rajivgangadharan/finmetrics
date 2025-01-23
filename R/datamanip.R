@@ -287,5 +287,5 @@ sum.WIPInDays <- function(dt, tib) {
 #' @param tib tibble to compute the WiP for every day
 #' @export construct.WIPTibble
 construct.WIPTibble <-  function(tib) {
-      tib %>% finmetrics::compute.WIP()
+      tib %>% mtrxrlib::compute.WIP()
 }

@@ -1,5 +1,5 @@
 # utils.R
-# File contains utility functions for the finmetrics package.
+# File contains utility functions for the mtrxrlib package.
 # Rajiv Gangadharan <rajiv.gangadharan@gmail.com>
 # Copyright 2017 Rajiv Gangadharan <rajiv.gangadharan@gmail.com>
 #

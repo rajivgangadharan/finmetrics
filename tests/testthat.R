@@ -1,4 +1,4 @@
 library(testthat)
-library(finmetrics)
+library(mtrxrlib)
 
-test_check("finmetrics")
+test_check("mtrxrlib")
