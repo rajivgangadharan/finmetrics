@@ -1,3 +1,5 @@
+library(utils)
+
 #' get.FilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%   addColCycleTime() %>% computeWeeklyFloorDates() %>% compute.Week()
 #' get.FilteredTibble(fileName="../Datasets/Opx_2021-06-17_Delivery.csv") %>%  addColCycleTime() %>% computeWeeklyFloorDates() %>% computePriorityBasedWeeklyClosureAggregates()
 
@@ -40,12 +42,10 @@ get.FilteredTibble <- function(fileName,
                     dateFormat = "%Y-%m-%d")
     )
   
-  # Onviously the Created date should be more than date_from
-  tib <- tib %>% dplyr::filter(Created >= date_from) 
+  date_from <- handle_invalid_date(date_from)
   
- 
-  tib
-     
+  # Obviously the Created date should be more than date_from
+  tib %>% dplyr::filter(Created >= date_from) 
 }
 
 #'

@@ -1,4 +1,4 @@
-Package: finmetrics
+Package: mtrxrlib
 Type: Package
 Title: Project Delivery Metrics
 Version: 0.1.2-3
@@ -17,12 +17,14 @@ Imports:
     dplyr,
     openintro,
     viridis,
-    colortools,
     methods,
     tibble,
     lubridate,
     readr,
     testthat (>= 3.0.0),
+    crosstalk,
+    DT,
+    jquerylib
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests:

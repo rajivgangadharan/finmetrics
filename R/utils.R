@@ -116,7 +116,10 @@ getAgeInDays <- function(beginDate, endDate = Sys.Date()) {
 get.Age.In.Days <- getAgeInDays
 
 readDataset <- function(fileName, sep = '|') {
-  stopifnot(file.exists(fileName)) # Will stop of the file doesn't exist
+  if (!file.exists(fileName)) {
+    stop(sprintf("The file '%s' does not exist. Please check the file path.", fileName))
+  }
+  # Will stop of the file doesn't exist
   # Loading the tab separated file
   readr::read_delim(fileName, sep,
                     escape_double = FALSE,
@@ -128,4 +131,17 @@ readCSVDataset <- function(fileName, sep = '|') {
   stopifnot(file.exists(fileName))
   df <- read.csv2(fileName, header = TRUE, sep = sep)
   df
+}
+
+handle_invalid_date <- function(date_string, format = "%Y-%m-%d", default = NA) {
+  # Try to parse the date
+  parsed_date <- as.Date(date_string, format = format)
+  
+  # Check if the date is valid
+  if (is.na(parsed_date)) {
+    warning(sprintf("Invalid date: '%s'. Returning default value.", date_string))
+    return(default) # Return the default value if the date is invalid
+  }
+  
+  return(parsed_date) # Return the valid date
 }
